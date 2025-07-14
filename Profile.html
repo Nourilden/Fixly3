@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Profile</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      animation: fadeIn 1s ease-in-out;
+      overflow-x: hidden;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    .profile-card {
+      max-width: 500px;
+      margin: 60px auto 0 auto;
+      padding: 38px 32px 32px 32px;
+      background: linear-gradient(120deg, #1f2b38 80%, #00f0ff22 100%);
+      border-radius: 32px;
+      box-shadow: 0 0 40px #00f0ff99, 0 8px 32px #000a;
+      text-align: center;
+      animation: slideIn 1.1s cubic-bezier(.68,-0.55,.27,1.55);
+      position: relative;
+      overflow: visible;
+    }
+
+    .profile-card::before {
+      content: '';
+      position: absolute;
+      top: -30px; left: 50%;
+      transform: translateX(-50%);
+      width: 180px; height: 40px;
+      background: radial-gradient(circle, #00f0ff88 0%, transparent 80%);
+      filter: blur(8px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes slideIn {
+      from {transform: translateY(60px) scale(0.95); opacity: 0;}
+      to {transform: translateY(0) scale(1); opacity: 1;}
+    }
+
+    .profile-pic {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 5px solid #00f0ff;
+      object-fit: cover;
+      box-shadow: 0 0 32px #00f0ff55, 0 2px 12px #000a;
+      margin-bottom: 18px;
+      background: #fff2;
+      transition: box-shadow 0.3s, border 0.3s;
+      animation: popIn 1.2s cubic-bezier(.68,-0.55,.27,1.55);
+      z-index: 1;
+      position: relative;
+    }
+    .profile-pic:hover {
+      box-shadow: 0 0 48px #00f0ffcc, 0 4px 24px #000a;
+      border: 5px solid #fff;
+      cursor: pointer;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.7) translateY(-40px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #00e6e6 0%, #0ff 100%);
+      color: #000;
+      border: none;
+      padding: 12px 28px;
+      margin-top: 28px;
+      border-radius: 16px;
+      font-weight: bold;
+      font-size: 1.1em;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #00f0ff44;
+      transition: background 0.3s, color 0.3s, box-shadow 0.2s, transform 0.2s;
+      position: relative;
+      z-index: 1;
+    }
+    .btn:hover {
+      background: linear-gradient(90deg, #0ff 0%, #00e6e6 100%);
+      color: #203a43;
+      box-shadow: 0 4px 24px #00f0ff99;
+      transform: scale(1.07) rotate(-1deg);
+    }
+    input[type="file"] {
+      margin: 10px 0 18px 0;
+      padding: 8px;
+      border-radius: 8px;
+      background: #203a43;
+      color: #fff;
+      border: 1.5px solid #00f0ff;
+      font-size: 1em;
+      box-shadow: 0 1px 8px #00f0ff22;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    input[type="file"]:hover {
+      border: 1.5px solid #fff;
+      box-shadow: 0 2px 16px #00f0ff44;
+    }
+    p, h1, h2, h3 {
+      z-index: 1;
+      position: relative;
+    }
+    strong {
+      color: #00f0ff;
+      letter-spacing: 1px;
+    }
+    .avatar-choice {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #00f0ff;
+      cursor: pointer;
+      object-fit: cover;
+      transition: box-shadow 0.2s;
+    }
+    .avatar-choice:hover {
+      box-shadow: 0 0 16px #00f0ff88, 0 4px 24px #000a;
+    }
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+}
+
+/* Header Styling */
+header {
+  width: 100%;
+  background: linear-gradient(to right, #0d0d0d, #1f1f1f);
+  padding: 15px 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: slideDown 0.5s ease;
+}
+
+/* Logo Container */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Icon */
+.icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #00ffe1;
+  background-color: #fff;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.icon:hover {
+  transform: rotate(10deg) scale(1.05);
+}
+
+/* Brand Name */
+.name-link {
+  text-decoration: none;
+}
+
+.name {
+  font-size: 2rem;
+  background: linear-gradient(90deg, #00ffe1, #007bff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+
+.name:hover {
+  filter: brightness(1.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .name {
+    font-size: 1.6rem;
+  }
+
+  .icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  header {
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .name {
+    font-size: 1.4rem;
+  }
+
+  .icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-container {
+    gap: 10px;
+  }
+}
+
+/* Animation */
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo-container">
+    <img class="icon" src="icon.png" alt="Fixly Icon">
+    <a href="interface.html" class="name-link">
+      <h1 class="name">Fixly</h1>
+    </a>
+  </div>
+</header>
+
+
+  <div class="profile-card">
+    <h1>Your Profile</h1>
+    <img id="profile-pic" class="profile-pic" src="default.png" alt="Profile Picture" onclick="document.getElementById('profile-image-input').click()" style="cursor:pointer;"><br>
+    <input type="file" id="profile-image-input" accept="image/*" style="margin: 10px 0; display: none;" />
+    <div id="avatar-choices" style="margin: 10px 0 18px 0; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+      <img src="images/Profile1.png" class="avatar-choice" title="Avatar 1">
+      <img src="images/Profile2.png" class="avatar-choice" title="Avatar 2">
+      <img src="images/Profile3.png" class="avatar-choice" title="Avatar 3">
+      <img src="images/Profile4.png" class="avatar-choice" title="Avatar 4">
+      <img src="images/Profile5.png" class="avatar-choice" title="Avatar 5">
+    </div>
+    <p><strong>Name:</strong> <span id="name"></span></p>
+    <p><strong>Email:</strong> <span id="email"></span></p>
+    <p><strong>Password:</strong> <span id="password"></span></p>
+    <button class="btn" onclick="goHome()">🏠 Home</button>
+  </div>
+
+  <script>
+    function goHome() {
+      window.location.href = "index.html";
+    }
+
+    // Use user object from localStorage if available
+    const user = JSON.parse(localStorage.getItem("user"));
+    document.getElementById("name").textContent = user?.name || localStorage.getItem("name") || "Unknown";
+    document.getElementById("email").textContent = user?.email || localStorage.getItem("email") || "Not available";
+    document.getElementById("password").textContent = user?.password || localStorage.getItem("password") || "Hidden";
+
+    const pic = user?.image || localStorage.getItem("profilePic");
+    if (pic) {
+      document.getElementById("profile-pic").src = pic;
+    }
+
+    // Handle profile image change
+    document.getElementById("profile-image-input").addEventListener("change", function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imageData = e.target.result;
+          document.getElementById("profile-pic").src = imageData;
+          // Save to user object if exists, else fallback
+          let user = JSON.parse(localStorage.getItem("user"));
+          if (user) {
+            user.image = imageData;
+            localStorage.setItem("user", JSON.stringify(user));
+          } else {
+            localStorage.setItem("profilePic", imageData);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Avatar choices logic
+    document.querySelectorAll('.avatar-choice').forEach(function(img) {
+      img.addEventListener('click', function() {
+        document.getElementById('profile-pic').src = this.src;
+        let user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+          user.image = this.src;
+          localStorage.setItem('user', JSON.stringify(user));
+        } else {
+          localStorage.setItem('profilePic', this.src);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

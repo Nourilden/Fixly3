@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixly - Developer Assistant Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark: #1e293b;
+            --light: #f8fafc;
+        }
+
+        html, body {
+            height: 100%;
+            min-height: 100vh;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .bg-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .animated-bg::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            animation: rotate 30s linear infinite;
+        }
+
+        .animated-bg::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 30%, #0f172a 70%);
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        .blob-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 250px;
+            height: 250px;
+            background: var(--secondary);
+            bottom: 10%;
+            right: 20%;
+            animation-delay: -3s;
+        }
+
+        .blob-3 {
+            width: 200px;
+            height: 200px;
+            background: #a855f7;
+            bottom: 30%;
+            left: 5%;
+            animation-delay: -6s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-20px) scale(1.05);
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            width: 100%;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .typing-animation::after {
+            content: "|";
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .code-line {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .code-line::before {
+            content: attr(data-line);
+            position: absolute;
+            left: 0;
+            color: #64748b;
+            font-size: 0.8rem;
+            user-select: none;
+        }
+
+        .code-editor {
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .code-editor-header {
+            background-color: #1e293b;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .code-content {
+            padding: 1rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .code-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .code-content::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .code-content::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .code-content::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .code-tag {
+            color: #ec4899;
+        }
+
+        .code-attr {
+            color: #6366f1;
+        }
+
+        .code-string {
+            color: #10b981;
+        }
+
+        .code-comment {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .page {
+            position: relative; /* Change from absolute to relative */
+            min-height: 100vh;
+            width: 100%;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            z-index: 1;
+        }
+
+        .page.hidden {
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .code-textarea {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'JetBrains Mono', monospace;
+            resize: none;
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            padding: 1rem;
+            line-height: 1.5;
+        }
+
+        .code-textarea:focus {
+            outline: none;
+        }
+
+        .ai-message {
+            border-left: 3px solid var(--primary);
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .ai-thinking {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .ai-thinking-dots {
+            display: flex;
+            margin-left: 0.5rem;
+        }
+
+        .ai-thinking-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            margin-right: 4px;
+            animation: pulseDot 1.5s infinite;
+        }
+
+        .ai-thinking-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .ai-thinking-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .error-highlight {
+            background-color: rgba(239, 68, 68, 0.2);
+            position: relative;
+        }
+
+        .error-highlight::after {
+            content: "⚠️";
+            position: absolute;
+            right: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .fix-highlight {
+            background-color: rgba(16, 185, 129, 0.2);
+            position: relative;
+        }
+
+        .fix-highlight::after {
+            content: "✓";
+            position: absolute;
+            right: 0.5rem;
+            font-size: 0.8rem;
+            color: #10b981;
+        }
+
+        .diff-added {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .diff-removed {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            text-decoration: line-through;
+        }
+
+        .ai-suggestion {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            margin: 0.25rem 0;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .ai-suggestion:hover {
+            background-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .code-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .code-tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .code-tab:hover:not(.active) {
+            border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .ai-chat-container {
+            height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: rgba(15, 23, 42, 0.5);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .ai-chat-input input {
+            flex-grow: 1;
+            background-color: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: var(--light);
+            outline: none;
+        }
+
+        .ai-chat-input input:focus {
+            border-color: var(--primary);
+        }
+
+        .ai-chat-input button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .ai-chat-input button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .ai-chat-message {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-chat-message:last-child {
+            border-bottom: none;
+        }
+
+        .ai-chat-message .sender {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .ai-chat-message .content {
+            line-height: 1.5;
+        }
+
+        .ai-chat-message.user .sender {
+            color: var(--light);
+        }
+
+        .ai-chat-message.ai .sender {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Home Page -->
+    <div id="home-page" class="page active min-h-screen flex flex-col">
+        <header class="container mx-auto px-6 py-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="bg-gradient w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold">Fixly</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#" class="hover:text-primary transition-colors">Features</a></li>
+                        <li><a href="docs.html" class="hover:text-primary transition-colors">Docs</a></li>
+                        <li><a href="about.html" class="hover:text-primary transition-colors">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main class="flex-grow flex items-center">
+            <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="flex flex-col justify-center slide-in" style="animation-delay: 0.2s;">
+                    <h2 class="text-5xl font-bold mb-6">Code. Test. <span class="text-gradient">Create.</span></h2>
+                    <p class="text-xl text-gray-300 mb-8">Write, test, and run code directly in your browser with our beautiful, interactive development environment.</p>
+                    <div class="flex flex-wrap gap-4">
+                      <a href="Get_Started.html"> <button id="get-started-btn" class="bg-gradient px-8 py-3 rounded-lg font-semibold text-white btn">Get Started</button></a> 
+                       <a href="Profile.html"> <button id="profile-btn" class="hidden border border-white/20 px-8 py-3 rounded-lg font-semibold text-white btn">Profile</button></a>
+             <a href="index.html">           <button id="fix-code-btn" class="bg-gradient px-8 py-3 rounded-lg font-semibold text-white btn">Fix My Code</button></a>
+                    </div>
+                </div>
+                <div class="flex justify-center items-center fade-in" style="animation-delay: 0.5s;">
+                    <div class="code-editor w-full max-w-lg">
+                        <div class="code-editor-header">
+                            <div class="flex">
+                                <div class="code-dot bg-red-500"></div>
+                                <div class="code-dot bg-yellow-500"></div>
+                                <div class="code-dot bg-green-500"></div>
+                            </div>
+                            <div class="text-sm text-gray-400">index.html</div>
+                        </div>
+                        <div class="code-content code-font text-sm">
+                            <div class="code-line" data-line="1"><span class="code-tag">&amp;lt;!DOCTYPE html&amp;gt;</span></div>
+                            <div class="code-line" data-line="2"><span class="code-tag">&amp;lt;html <span class="code-attr">lang</span>=<span class="code-string">"en"</span>&amp;gt;</span></div>
+                            <div class="code-line" data-line="3"><span class="code-tag">&amp;lt;head&amp;gt;</span></div>
+                            <div class="code-line" data-line="4">  <span class="code-tag">&amp;lt;meta <span class="code-attr">charset</span>=<span class="code-string">"UTF-8"</span>&amp;gt;</span></div>
+                            <div class="code-line" data-line="5">  <span class="code-tag">&amp;lt;title&amp;gt;</span>My Awesome Project<span class="code-tag">&amp;lt;/title&amp;gt;</span></div>
+                            <div class="code-line" data-line="6">  <span class="code-tag">&amp;lt;style&amp;gt;</span></div>
+                            <div class="code-line" data-line="7">    body {</div>
+                            <div class="code-line" data-line="8">      font-family: sans-serif;</div>
+                            <div class="code-line" data-line="9">      background: linear-gradient(135deg, #6366f1, #ec4899);</div>
+                            <div class="code-line" data-line="10">      color: white;</div>
+                            <div class="code-line" data-line="11">      display: flex;</div>
+                            <div class="code-line" data-line="12">      justify-content: center;</div>
+                            <div class="code-line" data-line="13">      align-items: center;</div>
+                            <div class="code-line" data-line="14">      height: 100vh;</div>
+                            <div class="code-line" data-line="15">      margin: 0;</div>
+                            <div class="code-line" data-line="16">    }</div>
+                            <div class="code-line" data-line="17">  <span class="code-tag">&amp;lt;/style&amp;gt;</span></div>
+                            <div class="code-line" data-line="18"><span class="code-tag">&amp;lt;/head&amp;gt;</span></div>
+                            <div class="code-line" data-line="19"><span class="code-tag">&amp;lt;body&amp;gt;</span></div>
+                            <div class="code-line" data-line="20">  <span class="code-tag">&amp;lt;h1&amp;gt;</span>Hello, Fixly!<span class="code-tag">&amp;lt;/h1&amp;gt;</span></div>
+                            <div class="code-line typing-animation" data-line="21"><span class="code-tag">&amp;lt;/body&amp;gt;</span></div>
+                            <div class="code-line" data-line="22"><span class="code-tag">&amp;lt;/html&amp;gt;</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="page hidden min-h-screen flex items-center justify-center">
+        <div class="container mx-auto px-6">
+            <div class="card max-w-md mx-auto rounded-xl p-8">
+                <div class="text-center mb-8">
+                    <div class="bg-gradient w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-2">Welcome to Fixly</h2>
+                    <p class="text-gray-300">Sign in to continue to your workspace</p>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <button id="github-login" class="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-colors">
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        Continue with GitHub
+                    </button>
+                    <button id="google-login" class="w-full bg-white hover:bg-gray-100 text-gray-800 py-3 px-4 rounded-lg flex items-center justify-center transition-colors">
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                            <path fill="#EA4335" d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.27 0 3.198 2.698 1.24 6.65l4.026 3.115Z"/>
+                            <path fill="#34A853" d="M16.04 18.013c-1.09.703-2.474 1.078-4.04 1.078a7.077 7.077 0 0 1-6.723-4.823l-4.04 3.067A11.965 11.965 0 0 0 12 24c2.933 0 5.735-1.043 7.834-3l-3.793-2.987Z"/>
+                            <path fill="#4A90E2" d="M19.834 21c2.195-2.048 3.62-5.096 3.62-9 0-.71-.109-1.473-.272-2.182H12v4.637h6.436c-.317 1.559-1.17 2.766-2.395 3.558L19.834 21Z"/>
+                            <path fill="#FBBC05" d="M5.277 14.268A7.12 7.12 0 0 1 4.909 12c0-.782.125-1.533.357-2.235L1.24 6.65A11.934 11.934 0 0 0 0 12c0 1.92.445 3.73 1.237 5.335l4.04-3.067Z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+                </div>
+
+                <div class="text-center">
+                    <button id="back-to-home" class="text-gray-300 hover:text-white transition-colors">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profile-page" class="page hidden min-h-screen flex items-center justify-center">
+        <div class="container mx-auto px-6">
+            <div class="card max-w-md mx-auto rounded-xl p-8">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-gradient rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-2">Your Profile</h2>
+                </div>
+
+                <div class="space-y-4 mb-8">
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <p class="text-sm text-gray-400 mb-1">Email</p>
+                        <p id="profile-email" class="font-medium">Not signed in</p>
+                    </div>
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <p class="text-sm text-gray-400 mb-1">Authentication</p>
+                        <p id="profile-auth-type" class="font-medium">Not signed in</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col space-y-3">
+                    <button id="logout-btn" class="bg-gradient px-8 py-3 rounded-lg font-semibold text-white btn">
+                        Sign Out
+                    </button>
+                    <button id="profile-home-btn" class="border border-white/20 px-8 py-3 rounded-lg font-semibold text-white btn">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thinking Page (Code Runner) -->
+    <div id="thinking-page" class="page hidden min-h-screen">
+        <div class="h-full flex flex-col md:flex-row">
+            <!-- Left Side - Loading Animation -->
+            <div class="w-full md:w-1/2 bg-gradient flex flex-col items-center justify-center p-8">
+                <div class="text-center mb-12">
+                    <div class="loading-spinner mx-auto mb-6"></div>
+                    <h2 class="text-3xl font-bold mb-3">Running Your Code...</h2>
+                    <p class="text-lg text-white/80 max-w-md mx-auto">Fixly is processing your code and preparing the output. This will just take a moment.</p>
+                </div>
+                
+                <div class="w-full max-w-md">
+                    <div class="bg-white/10 rounded-lg p-4 mb-6">
+                        <div class="flex items-center mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <h3 class="font-semibold">Processing</h3>
+                        </div>
+                        <div class="h-2 bg-white/20 rounded-full overflow-hidden">
+                            <div class="h-full bg-white" style="width: 75%; animation: progress 2s ease infinite;"></div>
+                        </div>
+                    </div>
+                    
+                    <button id="thinking-home-btn" class="w-full border border-white px-8 py-3 rounded-lg font-semibold text-white btn">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Right Side - Code Display -->
+            <div class="w-full md:w-1/2 bg-gray-900 p-8 overflow-auto">
+                <div class="code-editor w-full h-full">
+                    <div class="code-editor-header">
+                        <div class="flex">
+                            <div class="code-dot bg-red-500"></div>
+                            <div class="code-dot bg-yellow-500"></div>
+                            <div class="code-dot bg-green-500"></div>
+                        </div>
+                        <div class="text-sm text-gray-400">output.html</div>
+                    </div>
+                    <div id="code-output" class="code-content code-font text-sm">
+                        <div class="code-line" data-line="1"><span class="code-tag">&amp;lt;!DOCTYPE html&amp;gt;</span></div>
+                        <div class="code-line" data-line="2"><span class="code-tag">&amp;lt;html <span class="code-attr">lang</span>=<span class="code-string">"en"</span>&amp;gt;</span></div>
+                        <div class="code-line" data-line="3"><span class="code-tag">&amp;lt;head&amp;gt;</span></div>
+                        <div class="code-line" data-line="4">  <span class="code-tag">&amp;lt;meta <span class="code-attr">charset</span>=<span class="code-string">"UTF-8"</span>&amp;gt;</span></div>
+                        <div class="code-line" data-line="5">  <span class="code-tag">&amp;lt;title&amp;gt;</span>My Awesome Project<span class="code-tag">&amp;lt;/title&amp;gt;</span></div>
+                        <div class="code-line" data-line="6">  <span class="code-tag">&amp;lt;style&amp;gt;</span></div>
+                        <div class="code-line" data-line="7">    body {</div>
+                        <div class="code-line" data-line="8">      font-family: sans-serif;</div>
+                        <div class="code-line" data-line="9">      background: linear-gradient(135deg, #6366f1, #ec4899);</div>
+                        <div class="code-line" data-line="10">      color: white;</div>
+                        <div class="code-line" data-line="11">      display: flex;</div>
+                        <div class="code-line" data-line="12">      justify-content: center;</div>
+                        <div class="code-line" data-line="13">      align-items: center;</div>
+                        <div class="code-line" data-line="14">      height: 100vh;</div>
+                        <div class="code-line" data-line="15">      margin: 0;</div>
+                        <div class="code-line" data-line="16">    }</div>
+                        <div class="code-line" data-line="17">  <span class="code-tag">&amp;lt;/style&amp;gt;</span></div>
+                        <div class="code-line" data-line="18"><span class="code-tag">&amp;lt;/head&amp;gt;</span></div>
+                        <div class="code-line" data-line="19"><span class="code-tag">&amp;lt;body&amp;gt;</span></div>
+                        <div class="code-line" data-line="20">  <span class="code-tag">&amp;lt;h1&amp;gt;</span>Hello, Fixly!<span class="code-tag">&amp;lt;/h1&amp;gt;</span></div>
+                        <div class="code-line" data-line="21"><span class="code-tag">&amp;lt;/body&amp;gt;</span></div>
+                        <div class="code-line" data-line="22"><span class="code-tag">&amp;lt;/html&amp;gt;</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fix Code Page -->
+    <div id="fix-code-page" class="page hidden min-h-screen flex flex-col">
+        <header class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="bg-gradient w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold">Fixly</h1>
+                </div>
+                <button id="fix-home-btn" class="border border-white/20 px-4 py-2 rounded-lg font-medium text-white btn">
+                    Back to Home
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-grow container mx-auto px-6 py-4 flex flex-col">
+            <h2 class="text-3xl font-bold mb-6">AI Code Fixer</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-grow">
+                <!-- Left Side - Code Input -->
+                <div class="flex flex-col">
+                    <div class="flex items-center mb-4">
+                        <h3 class="text-xl font-semibold">Your Code</h3>
+                        <div class="ml-auto flex">
+                            <button id="paste-sample-btn" class="text-sm bg-gray-700 hover:bg-gray-600 text-white py-1 px-3 rounded-lg transition-colors mr-2">
+                                Paste Sample
+                            </button>
+                            <button id="clear-code-btn" class="text-sm bg-gray-700 hover:bg-gray-600 text-white py-1 px-3 rounded-lg transition-colors">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="code-editor flex-grow">
+                        <div class="code-editor-header">
+                            <div class="flex">
+                                <div class="code-dot bg-red-500"></div>
+                                <div class="code-dot bg-yellow-500"></div>
+                                <div class="code-dot bg-green-500"></div>
+                            </div>
+                            <div class="text-sm text-gray-400">input.html</div>
+                        </div>
+                        <div class="h-full">
+                            <textarea id="code-input" class="code-textarea" placeholder="Paste your code here..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 flex">
+                        <button id="fix-code-action-btn" class="bg-gradient px-6 py-3 rounded-lg font-semibold text-white btn flex-grow">
+                            Fix My Code
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Right Side - AI Analysis -->
+                <div class="flex flex-col">
+                    <div class="flex items-center mb-4">
+                        <h3 class="text-xl font-semibold">AI Analysis</h3>
+                        <div class="ml-auto">
+                            <div class="flex">
+                                <div class="code-tab active" data-tab="fixes">Fixes</div>
+                                <div class="code-tab" data-tab="chat">Chat</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="fixes-tab" class="flex-grow flex flex-col">
+                        <div id="ai-analysis" class="bg-gray-800/50 rounded-lg p-4 mb-4 flex-grow overflow-y-auto">
+                            <div class="text-center text-gray-400 py-8">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                </svg>
+                                <p class="text-lg font-medium mb-2">No code analyzed yet</p>
+                                <p>Paste your code and click "Fix My Code" to get started</p>
+                            </div>
+                        </div>
+                        
+                        <div class="code-editor">
+                            <div class="code-editor-header">
+                                <div class="flex">
+                                    <div class="code-dot bg-red-500"></div>
+                                    <div class="code-dot bg-yellow-500"></div>
+                                    <div class="code-dot bg-green-500"></div>
+                                </div>
+                                <div class="text-sm text-gray-400">fixed.html</div>
+                            </div>
+                            <div id="fixed-code" class="code-content code-font text-sm h-64 overflow-y-auto">
+                                <div class="text-center text-gray-400 py-8">
+                                    <p>Fixed code will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex">
+                            <button id="copy-fixed-btn" class="border border-white/20 px-6 py-3 rounded-lg font-semibold text-white btn flex-grow" disabled>
+                                Copy Fixed Code
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="chat-tab" class="flex-grow flex flex-col hidden">
+                        <div id="ai-chat" class="ai-chat-container flex-grow">
+                            <div class="ai-chat-message ai">
+                                <div class="sender">Fixly AI</div>
+                                <div class="content">Hello! I'm your AI code assistant. Ask me any questions about your code or how to fix specific issues.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-chat-input">
+                            <input type="text" id="chat-input" placeholder="Ask about your code..." />
+                            <button id="send-chat-btn">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

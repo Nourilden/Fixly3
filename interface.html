@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fixly</title>
+  <link rel="icon" href="icon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+/* Reset and base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header container */
+header {
+  width: 100%;
+  padding: 10px 20px;
+  background-color: #121212;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #444;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Icon logo */
+.icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Brand name */
+.name {
+  font-size: 1.8rem;
+  margin-left: 10px;
+  flex: 1;
+  color: #00d4ff;
+  font-weight: bold;
+}
+
+/* Buttons and profile container */
+.btns {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Get Started button */
+.btn {
+  padding: 8px 16px;
+  background-color: #00d4ff;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  color: #000;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: #00bcd4;
+  transform: scale(1.05);
+}
+
+/* Profile image */
+.profileimg-ball {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #00d4ff;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  .name {
+    font-size: 1.5rem;
+    margin: 10px 0;
+  }
+
+  .btns {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .btn {
+    width: auto;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .name {
+    font-size: 1.3rem;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .profileimg-ball {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <img class="icon" src="icon.png" alt="">
+    <h1 class="name">Fixly</h1>
+    <div class="btns">
+<a href="Get_Started.html"> <button class="btn" id="getStartedBtn" onclick="onLoginSuccess()">Get Started</button></a>
+<a href="Profile.html"><img alt="Profileimg" class="profileimg-ball" id="profileimg-ball"></a> 
+    </div>
+
+  </header>
+  <main class="main">
+    <textarea placeholder="Enter your code here..." class="codearea" id="codearea"></textarea>
+
+    <div class="lang-wrapper">
+      <h3 class="lan_text">Language :</h3>
+      <select id="language" class="language">
+        <option value="" disabled selected>Select a language</option>
+        <!-- Grouped by categories for better readability -->
+        <optgroup label="Popular">
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+          <option value="java">Java</option>
+          <option value="csharp">C#</option>
+          <option value="cpp">C++</option>
+        </optgroup>
+        <optgroup label="Web">
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="php">PHP</option>
+          <option value="typescript">TypeScript</option>
+        </optgroup>
+        <optgroup label="Others">
+          <option value="ruby">Ruby</option>
+          <option value="go">Go</option>
+          <option value="swift">Swift</option>
+          <option value="kotlin">Kotlin</option>
+          <option value="sql">SQL</option>
+          <option value="bash">Bash</option>
+          <option value="r">R</option>
+          <option value="dart">Dart</option>
+          <option value="rust">Rust</option>
+          <!-- Add more if needed -->
+        </optgroup>
+      </select>
+    </div>
+    <div class="btns">
+      <button class="btn" id="runBtn" onclick="sendCode()">Run Code</button>
+      <button class="btn" id="clearBtn" onclick="clearCode()">Clear</button>
+    </div>
+
+</main>
+  <footer>
+    <p class="copy">&copy; 2025 Fixly. All rights reserved.</p>  
+  </footer>
+  <script src="script.js"></script>
+  <script>
+    // Set small profile image (ball) from localStorage
+    (function() {
+      const img = document.getElementById('profileimg-ball');
+      let user = JSON.parse(localStorage.getItem('user'));
+      img.src = (user && user.image) ? user.image : 'default.png';
+      img.title = user && user.name ? user.name : 'Profile';
+      img.onclick = function() {
+        toggleProfile(true);
+      };
+    })();
+    // Function to run code
+    function runCode() {
+      const code = document.getElementById('codearea').value;
+      const language = document.getElementById('language').value;
+
+      if (!code.trim()) {
+        alert('Please enter some code to run.');
+        return;
+      }
+
+      if (!language) {
+        alert('Please select a programming language.');
+        return;
+      }
+window.location.href = `thinking.html?code=${encodeURIComponent(code)}&language=${encodeURIComponent(language)}`;
+    }
+    
+function sendCode() {
+  const code = document.getElementById("codearea").value;
+  localStorage.setItem("generatedCode", code);
+  window.location.href = "thinking.html";
+}
+
+  </script>
+</body>
+</html>

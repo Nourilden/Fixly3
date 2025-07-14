@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixly | About</title>
+    <style>
+        /* Base Styles (30 lines) */
+        :root {
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --light-blue: #00a8ff;
+            --dark-blue: #0077b6;
+            --text-light: #e0e0e0;
+            --text-lighter: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Header Styles (15 lines) */
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,168,255,0.1) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            animation: pulse 8s infinite alternate;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--light-blue), var(--text-lighter));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        /* Animation Keyframes (10 lines) */
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px var(--light-blue), 0 0 10px var(--light-blue); }
+            to { text-shadow: 0 0 15px var(--light-blue), 0 0 25px var(--dark-blue); }
+        }
+        
+        /* App Description (10 lines) */
+        .app-description {
+            background-color: var(--darker-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            border-left: 3px solid var(--light-blue);
+            transform: translateX(-20px);
+            opacity: 0;
+            animation: slideIn 0.8s forwards 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes slideIn {
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Team Section (20 lines) */
+        .team {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .team-member {
+            background-color: var(--darker-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            opacity: 0;
+            animation: fadeIn 0.8s forwards;
+            animation-delay: calc(var(--delay) * 0.2s);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .team-member:hover {
+            transform: translateY(-1rem);
+            box-shadow: 0 15px 30px rgba(0,168,255,0.2);
+        }
+        
+        .team-member img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--light-blue);
+        }
+        
+        .team-member-info {
+            padding: 1.5rem;
+        }
+        
+        .team-member h3 {
+            color: var(--text-lighter);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .team-member .role {
+            color: var(--light-blue);
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(0px); }
+            to { opacity: 1; transform: translateY(20px); }
+        }
+        
+        /* Footer (15 lines) */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(0,168,255,0.2);
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,168,255,0.05), transparent);
+            z-index: -1;
+        }
+        
+        .app-version {
+            color: var(--light-blue);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        
+        /* Responsive (10 lines) */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .team {
+                grid-template-columns: 1fr;
+            }
+            
+            .team-member {
+                max-width: 100%;
+            }
+        }
+        /* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+}
+
+/* Header Styling */
+.header {
+  width: 100%;
+  background: linear-gradient(to right, #0d0d0d, #1f1f1f);
+  padding: 15px 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: slideDown 0.5s ease;
+}
+
+/* Logo Container */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Icon */
+.icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #00ffe1;
+  background-color: #fff;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.icon:hover {
+  transform: rotate(10deg) scale(1.05);
+}
+
+/* Brand Name */
+.name-link {
+  text-decoration: none;
+}
+
+.name {
+  font-size: 2rem;
+  background: linear-gradient(90deg, #00ffe1, #007bff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+
+.name:hover {
+  filter: brightness(1.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .name {
+    font-size: 1.6rem;
+  }
+
+  .icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .header {
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .name {
+    font-size: 1.4rem;
+  }
+
+  .icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-container {
+    gap: 10px;
+  }
+}
+
+/* Animation */
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+    </style>
+</head>
+<body>
+    <div class="header">
+  <div class="logo-container">
+    <img class="icon" src="icon.png" alt="Fixly Icon">
+    <a href="interface.html" class="name-link">
+      <h1 class="name">Fixly</h1>
+    </a>
+  </div>
+    </div>
+    <div class="container">
+        <header>
+            <h1>Fixly</h1>
+            <p>The ultimate debugging companion for developers</p>
+        </header>
+        
+        <section class="app-description">
+            <h2>About | Fixly</h2>
+            <p>Solve Errors is a powerful debugging tool designed to help developers quickly identify, understand, and resolve errors in their code. Our AI-powered solution analyzes your error messages and provides clear explanations, potential fixes, and relevant documentation.</p>
+            <p>Whether you're a beginner just starting out or a seasoned professional, Solve Errors will save you hours of frustration and get you back to coding faster.</p>
+        </section>
+        
+        <section class="team">
+            <h2 style="grid-column: 1/-1; margin-bottom: -1rem;">Our Team</h2>
+            
+            <div class="team-member" style="--delay: 1">
+                <img src="Noureldin.png" alt="Lead Developer">
+                <div class="team-member-info">
+                    <h3>Noureldin Mahmoud</h3>
+                    <span class="role">Web Developer</span>
+                    <p>Noureldin architected the core error analysis engine and oversees all technical development. With 10+ years in software engineering, he ensures Solve Errors stays at the cutting edge.</p>
+                </div>
+            </div>
+            
+            <div class="team-member" style="--delay: 2">
+                <img src="Omar.png" alt="UX Designer">
+                <div class="team-member-info">
+                    <h3>Omar Mahmoud</h3>
+                    <span class="role">UX Designer</span>
+                    <p>Omar designed the intuitive interface that makes complex error analysis accessible to everyone. Her user-centered approach ensures a seamless experience across all devices.</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>© 2023 Solve Errors. All rights reserved.</p>
+            <p class="app-version">Version 2.1.4</p>
+        </footer>
+    </div>
+</body>
+</html>

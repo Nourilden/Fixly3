@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fixly | Login & Signup</title>
+  <style>
+    :root {
+      --bg: #000;
+      --card: #121212;
+      --text: #fff;
+      --input-bg: #1f1f1f;
+      --primary: #00bcd4;
+      --button-hover: #00acc1;
+    }
+
+    body[data-theme="light"] {
+      --bg: #f5f5f5;
+      --card: #fff;
+      --text: #000;
+      --input-bg: #f0f0f0;
+      --primary: #007bff;
+      --button-hover: #0056b3;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 400px;
+      width: 100%;
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.7rem;
+      background: var(--input-bg);
+      border: 1px solid #555;
+      color: var(--text);
+      border-radius: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      background: var(--primary);
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+    }
+
+    .github-btn {
+      background: #24292e;
+    }
+
+    .theme-btn {
+      background: #444;
+      margin-top: 0.5rem;
+    }
+
+    .toggle-link {
+      text-align: center;
+      margin-top: 1rem;
+      cursor: pointer;
+      color: var(--primary);
+    }
+
+    .toggle-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 500px) {
+      body {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="form-title">Login</h2>
+    <form id="auth-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" required minlength="6" />
+      </div>
+      <div class="form-group" id="name-group" style="display:none;">
+        <label>Name</label>
+        <input type="text" id="name" />
+      </div>
+      <button type="submit" id="submit-btn">Login</button>
+    </form>
+
+    <div class="toggle-link" onclick="toggleForm()">Don't have an account? Sign up</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    emailjs.init("LUoDMEQQhr_ja3Ec3"); // Replace with your EmailJS user ID
+
+    let isLogin = true;
+
+    document.body.setAttribute("data-theme", localStorage.getItem("theme") || "dark");
+
+    function toggleTheme() {
+      const current = document.body.getAttribute("data-theme");
+      const newTheme = current === "dark" ? "light" : "dark";
+      document.body.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+    }
+
+    function toggleForm() {
+      isLogin = !isLogin;
+      document.getElementById("form-title").innerText = isLogin ? "Login" : "Sign Up";
+      document.getElementById("submit-btn").innerText = isLogin ? "Login" : "Sign Up";
+      document.getElementById("name-group").style.display = isLogin ? "none" : "block";
+      document.querySelector(".toggle-link").innerText = isLogin
+        ? "Don't have an account? Sign up"
+        : "Already have an account? Login";
+    }
+
+    document.getElementById("auth-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const name = document.getElementById("name").value.trim();
+
+      if (!email || !password || (!isLogin && !name)) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      localStorage.setItem("user", JSON.stringify({ email, password, name }));
+
+      if (!isLogin) {
+        emailjs.send("service_ljpbcbj", "template_x0evbyw", {
+          to_email: email,
+          from_name: "Fixly",
+          message: `Welcome to Fixly, ${name}!`
+        }).then(() => {
+          alert("Signup successful! Confirmation email sent.");
+          // Save user data to localStorage
+          saveUserData(name, email, password);
+          window.location.href = "index.html";
+        }).catch(err => {
+          console.error(err);
+          alert("Signup success");
+        window.location.href = "interface.html";
+
+        });
+      } else {
+        alert("Login successful!");
+        window.location.href = "interface.html";
+      }
+    });
+
+function saveUserData(name, email, password, profilePic = "default.png") {
+  localStorage.setItem("name", name);
+  localStorage.setItem("email", email);
+  localStorage.setItem("password", password);
+  localStorage.setItem("profilePic", profilePic);
+  localStorage.setItem("loggedIn", "true");
+}
+
+
+  </script>
+</body>
+</html>
